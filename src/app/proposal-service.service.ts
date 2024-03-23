@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map, of, timeout } from 'rxjs';
+import { ErrorEnum, ErrorEnumMessage } from './errors-enum';
 
 
 export interface ProductResolved {
   proposal: boolean | undefined;
-  error?: string;
+  error?: ErrorEnum;
 }
 
 
@@ -16,19 +17,19 @@ export class ProposalServiceService {
   loadProposal(): Observable<ProductResolved> {
     const source: Observable<boolean> = new Observable<boolean>((observer) => {
       setTimeout(() => {
-        observer.error('Proposal not found');
-      }, 10000);
+        observer.error({name: ErrorEnum.ProposalNotFoundError ,message:ErrorEnumMessage.ProposalNotFoundError});
+      }, 5000);
       setTimeout(() => {
         observer.next(true);
-      }, 15000);
+      }, 4000);
     });
 
     return source.pipe(
       map(response => {
         return { proposal: response};
       }),
-      timeout(10000),
-      catchError(() => of({ proposal: undefined, error: 'Proposal not found'}))
+      timeout(3000),
+      catchError((error) => of({ proposal: undefined, error: error.name}))
     );
   }
 
